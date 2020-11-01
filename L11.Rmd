@@ -1,0 +1,133 @@
+---
+title: "L11"
+author: "Kovel"
+date: '1 Р Р…Р С•РЎРЏР В±РЎР‚РЎРЏ 2020 Р С– '
+output:
+  word_document: default
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Download the data
+```{r}
+set.seed(123)
+path='C:/education.csv'
+```
+##Висновок: для побудови моделі кластеризації використано дані про учнів школ двох типів. Залишимо для моделювання лише кількісні змінні. Датасет не потребує розподілу на навчальну та тестову вибірки, не потребує шкалювання.
+```{r}
+f <- read.csv(file = path, header = TRUE, encoding = 'UNICOD')
+head(f)
+```
+## Загружені данні
+## Factors as numeric
+```{r}
+f$school <- as.numeric(as.factor(f$school))-1
+f$sex <- as.numeric(as.factor(f$sex))-1
+f$reason <- as.numeric(as.factor(f$reason))-1
+f$guardian <- as.numeric(as.factor(f$guardian))-1
+f$activities <- as.numeric(as.factor(f$activities))-1
+f$internet <- as.numeric(as.factor(f$internet))-1
+head (f)
+```
+##Висновок:Качествені данні переведені у кількісні
+## Historgram for each attribute
+```{r}
+library(tidyr)
+library(ggplot2)
+f %>% 
+  gather(Attributes, value, 1:8) %>% 
+  ggplot(aes(x=value)) +
+  geom_histogram(fill = "lightblue2", color = "black") + 
+  facet_wrap(~Attributes, scales = "free_x") +
+  labs(x = "Value", y = "Frequency")
+```
+##Візуалізація данних
+## Correlation
+```{r}
+library(corrplot)
+corrplot(cor(f), type = "upper", method = "ellipse", tl.cex = 0.9)
+```
+##Візуалізація данних
+# NbCLust
+```{r}
+library(factoextra)
+library(NbClust)
+
+res.nbclust <- NbClust(f, distance = "euclidean",
+                  min.nc = 2, max.nc = 10, 
+                  method = "complete", index ="all")
+fviz_nbclust(res.nbclust) + theme_minimal() + ggtitle("NbClust's optimal number of clusters")
+
+# Elbow method
+# The sum of squares at each number of clusters is calculated and graphed, and the user looks for a change of slope from steep to shallow (an elbow) to determine the optimal number of clusters.
+fviz_nbclust(f, kmeans, method = "wss") +
+    geom_vline(xintercept = 3, linetype = 2)+
+  labs(subtitle = "Elbow method")
+
+# Silhouette method
+# The optimal number of clusters k is the one that maximize the average silhouette over a range of possible values for k.
+fviz_nbclust(f, kmeans, method = "silhouette")+
+  labs(subtitle = "Silhouette method")
+
+# Gap statistic
+# The gap statistic compares the total within intra-cluster variation for different values of k with their expected values under null reference distribution of the data. The estimate of the optimal clusters will be value that maximize the gap statistic. This means that the clustering structure is far away from the random uniform distribution of points.
+fviz_nbclust(f, kmeans, nstart = 25,  method = "gap_stat", nboot = 50)+
+  labs(subtitle = "Gap statistic method")
+```
+##Зроблено висновок про доцільність використання 4 кластерів (8 proposed  4 as the best number of clusters)
+## Clustree
+```{r}
+library(clustree)
+library(dplyr)
+tmp <- NULL
+for (k in 1:4){
+  tmp[k] <- kmeans(f, k, nstart = 30)
+}
+df <- data.frame(tmp)
+# add a prefix to the column names
+colnames(df) <- seq(1:4
+                    )
+colnames(df) <- paste0("k",colnames(df))
+# get individual PCA
+df.pca <- prcomp(df, center = TRUE, scale. = FALSE)
+ind.coord <- df.pca$x
+ind.coord <- ind.coord[,1:2]
+df <- bind_cols(as.data.frame(df), as.data.frame(ind.coord))
+clustree(df, prefix = "k")
+```
+##Візуалізація роздроблення на 4 кластера
+# Fitting K-Means to the dataset
+```{r}
+set.seed(29)
+model_km = kmeans(f, 4)
+#cluster cores
+y_km = model_km$cluster
+aggregate(f,by=list(y_km),FUN=mean)
+```
+##Висновок: на основі методу k-середніх описано чотири кластера: 1 – “дорослі та сердній studytime”, 2 – “середнього віку та середній studytime”, 3 – “дорослі та високий studytime”, 4 - "середнього віку високий studytime". Розраховано характеристики типового об’єкту кластерів.
+# Visualising the clusters
+```{r}
+library(cluster)
+clusplot(f[,c('age','traveltime')],
+         y_km,
+         lines = 0,
+         shade = TRUE,
+         color = TRUE,
+         labels= 0,
+         plotchar = FALSE,
+         span = TRUE,
+         main = paste('Clusters of customers'),
+         xlab = 'Age',
+         ylab = 'Traveltime')
+```
+##Висновок: проведено візуалізацію кластерів на датасеті.
+# Comparing to HC
+```{r}
+library(clusteval)
+cluster_similarity(y_hc,y_km)
+```
+##Висновок: отримані кластери перетинаються на 52,2%
