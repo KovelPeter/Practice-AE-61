@@ -1,0 +1,118 @@
+---
+title: "L9"
+author: "Kovel"
+date: '31 РѕРєС‚СЏР±СЂСЏ 2020 Рі '
+output:
+  word_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Download the data
+```{r}
+set.seed(123)
+f_train <- read.csv2('education_train.csv', header = TRUE, encoding = 'UNICOD')
+f_test <- read.csv2('education_test.csv', header = TRUE, encoding = 'UNICOD')
+f_train <- f_train[-1]
+f_test <- f_test[-1]
+```
+##Висновок: завантажано датасет,який було розподілено на навчальну та тестову вибірки.
+# Fitting 
+```{r}
+# install.packages('rpart')
+library(rpart)
+f_train$school <- as.factor(f_train$school)
+f_test$school <- as.factor(f_test$school)
+class_dt = rpart(school ~ ., data = f_train)
+```
+##Висновок: базову модель дерева побудовано на основі всіх змінних.
+## Predicting
+```{r}
+y <- predict(class_dt, f_test[-10], type = 'class')
+```
+##Висновок: визначені класи об’єктів (вектор у).
+## Confusion Matrix
+```{r}
+cm = table(f_test[, 'school'], y)
+print(cm)
+```
+##Висновок: точність моделі – (112+5) / 131 = 89,3 %, частка невірно класифікованих випадків – (10+4) / 131 = 10,7 %. Чутливість – 5 / (10+5) = 34 %, специфічність – 112 / (112+4) = 96 %, тобто модель суттєво більш чутлива до виявленнянегативних випадків. У цьому разі – попадання до школи другого типу.
+# Plotting the tree
+```{r}
+plot(class_dt)
+text(class_dt)
+```
+##Висновок: візуалізація дозволяє проаналізувати логіку побудови дерева. 
+# Fitting 2 factors
+```{r}
+class_ct = rpart(school ~ age + traveltime, data = f_train)
+```
+##Висновок: проведено навчання моделі дерева рішень із включенням двох значющих факторів.
+## Predicting
+```{r}
+y <- predict(class_ct, f_test[, c('age','traveltime')], type = 'class')
+```
+##Висновок: визначено класи об’єктів (вектор у). Для цього використано параметр type = ‘class’.
+## Confusion Matrix
+```{r}
+cm = table(f_test[, 'school'], y)
+print(cm)
+```
+##Висновок: точність моделі – (115+2) / 131 = 89,3 %, частка невірно класифікованих випадків – (13+1) / 131 = 10,7 %. Чутливість – 2 / (13+2) = 14 %, специфічність – 115 / (115+1) = 99,1 %, тобто модель суттєво більш чутлива до виявлення негативних випадків. У цьому разі також – попадання до школи другого типу.
+# Visualising the Test set results
+```{r}
+library(ggplot2)
+set = f_test[,c('age','traveltime','school')]
+X1 = seq(min(set['age']) - 1, max(set['age']) + 1, by = 0.01)
+X2 = seq(min(set['traveltime']) - 1, max(set['traveltime']) + 1, by = 0.01)
+grid_set = expand.grid(X1, X2)
+colnames(grid_set) = c('age', 'traveltime')
+y_grid = predict(class_ct, grid_set, type = 'class')
+plot(set[, -3],
+     main = 'Classification Tree',
+     xlab = 'Age', ylab = 'Traveltime',
+     xlim = range(X1), ylim = range(X2))
+contour(X1, X2, matrix(as.numeric(y_grid), length(X1), length(X2)), add = TRUE)
+points(grid_set, pch = '.', col = ifelse(y_grid == 1, 'tomato', 'springgreen3'))
+points(set, pch = 21, bg = ifelse(set[, 3] == 1, 'red3', 'green4'))
+```
+##Висновок: на графіку червоним позначені випадки потрапляння до школи першого типу, зеленим – ло другого. Зеленим виділена зона високої ймовірності потрапляння до другого типу. Модель описує нелінійний варіант розподіляючої кривої.
+# Fitting Random Forest Classification to the Training set
+```{r}
+# install.packages('randomForest')
+library(randomForest)
+set.seed(123)
+class_rf = randomForest(school ~ age + traveltime, data = f_train, ntree = 10)
+```
+##Висновок: проведено навчання моделі випадкового лісу.
+## Predicting
+```{r}
+y <- predict(class_rf, f_test[, c('age','traveltime')])
+```
+##Висновок: визначені класи об’єктів (вектор у). Для цього використано параметр type = ‘class’.
+## Confusion Matrix
+```{r}
+cm = table(f_test[, 'school'], y)
+print(cm)
+```
+##Висновок: точність моделі – (115+2) / 131 = 89,3 %, частка невірно класифікованих випадків – (13+1) / 131 = 10,7 %. Чутливість – 2 / (13+2) = 14 %, специфічність – 115 / (115+1) = 99,1 %, тобто модель суттєво більш чутлива до виявлення негативних випадків. У цьому разі всі ці характеристики моделі залишилися на тому самому рівні.
+# Visualising the Test set results
+```{r}
+set = f_test[,c('age','traveltime','school')]
+X1 = seq(min(set['age']) - 1, max(set['age']) + 1, by = 0.01)
+X2 = seq(min(set['traveltime']) - 1, max(set['traveltime']) + 1, by = 0.01)
+grid_set = expand.grid(X1, X2)
+colnames(grid_set) = c('age', 'traveltime')
+y_grid = predict(class_rf, grid_set)
+plot(set[, -3],
+     main = 'Random Forest',
+     xlab = 'Age', ylab = 'traveltime',
+     xlim = range(X1), ylim = range(X2))
+contour(X1, X2, matrix(as.numeric(y_grid), length(X1), length(X2)), add = TRUE)
+points(grid_set, pch = '.', col = ifelse(y_grid == 1, 'tomato', 'springgreen3'))
+points(set, pch = 21, bg = ifelse(set[, 3] == 1, 'red3', 'green4'))
+```
+##Висновок:красне поле-ймовірність того,що учень навчвється у школі першого типу, зелене - другого.

@@ -1,0 +1,297 @@
+\documentclass[]{article}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\usepackage{fixltx2e} % provides \textsubscript
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+\else % if luatex or xelatex
+  \ifxetex
+    \usepackage{mathspec}
+  \else
+    \usepackage{fontspec}
+  \fi
+  \defaultfontfeatures{Ligatures=TeX,Scale=MatchLowercase}
+\fi
+% use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+% use microtype if available
+\IfFileExists{microtype.sty}{%
+\usepackage[]{microtype}
+\UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\PassOptionsToPackage{hyphens}{url} % url is loaded by hyperref
+\usepackage[unicode=true]{hyperref}
+\hypersetup{
+            pdftitle={R Notebook},
+            pdfborder={0 0 0},
+            breaklinks=true}
+\urlstyle{same}  % don't use monospace font for urls
+\usepackage[margin=1in]{geometry}
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.77,0.63,0.00}{#1}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\usepackage{graphicx,grffile}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+\IfFileExists{parskip.sty}{%
+\usepackage{parskip}
+}{% else
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt plus 2pt minus 1pt}
+}
+\setlength{\emergencystretch}{3em}  % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{0}
+% Redefines (sub)paragraphs to behave more like sections
+\ifx\paragraph\undefined\else
+\let\oldparagraph\paragraph
+\renewcommand{\paragraph}[1]{\oldparagraph{#1}\mbox{}}
+\fi
+\ifx\subparagraph\undefined\else
+\let\oldsubparagraph\subparagraph
+\renewcommand{\subparagraph}[1]{\oldsubparagraph{#1}\mbox{}}
+\fi
+
+% set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+
+
+\title{R Notebook}
+\author{}
+\date{\vspace{-2.5em}}
+
+\begin{document}
+\maketitle
+
+\section{Download data}\label{download-data}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{path=}\StringTok{'C:/indeks.csv'}
+\NormalTok{f <-}\StringTok{ }\KeywordTok{read.csv2}\NormalTok{(}\DataTypeTok{file =}\NormalTok{ path, }\DataTypeTok{header =} \OtherTok{TRUE}\NormalTok{, }\DataTypeTok{encoding =} \StringTok{'UNICOD'}\NormalTok{)}
+\CommentTok{#Connect library}
+\KeywordTok{library}\NormalTok{ (dplyr)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Attaching package: 'dplyr'
+\end{verbatim}
+
+\begin{verbatim}
+## The following objects are masked from 'package:stats':
+## 
+##     filter, lag
+\end{verbatim}
+
+\begin{verbatim}
+## The following objects are masked from 'package:base':
+## 
+##     intersect, setdiff, setequal, union
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{#Have a look at the data}
+\KeywordTok{glimpse}\NormalTok{(f)  }
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Rows: 98
+## Columns: 6
+## $ t  <int> 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 1...
+## $ Y  <dbl> 0.826, 0.812, 0.844, 0.782, 1.532, 1.564, 1.657, 1.575, 1.092, 1...
+## $ X1 <dbl> 1.007, 1.012, 1.009, 1.008, 1.538, 1.597, 1.607, 1.509, 1.017, 1...
+## $ X2 <dbl> 3.856, 3.887, 3.896, 3.857, 5.508, 5.510, 5.459, 5.508, 6.673, 6...
+## $ X3 <dbl> 51.2, 51.8, 52.1, 50.5, 45.2, 45.4, 45.6, 46.0, 48.2, 48.1, 48.6...
+## $ X4 <dbl> 0.435, 0.437, 0.433, 0.438, 0.225, 0.226, 0.231, 0.224, 0.467, 0...
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{head}\NormalTok{(f)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##   t     Y    X1    X2   X3    X4
+## 1 1 0.826 1.007 3.856 51.2 0.435
+## 2 2 0.812 1.012 3.887 51.8 0.437
+## 3 3 0.844 1.009 3.896 52.1 0.433
+## 4 4 0.782 1.008 3.857 50.5 0.438
+## 5 5 1.532 1.538 5.508 45.2 0.225
+## 6 6 1.564 1.597 5.510 45.4 0.226
+\end{verbatim}
+
+\subsection{Висновок: кількість спостережень:98 кількість
+змінних:6}\label{ux432ux438ux441ux43dux43eux432ux43eux43a-ux43aux456ux43bux44cux43aux456ux441ux442ux44c-ux441ux43fux43eux441ux442ux435ux440ux435ux436ux435ux43dux44c98-ux43aux456ux43bux44cux43aux456ux441ux442ux44c-ux437ux43cux456ux43dux43dux438ux4456}
+
+\subsection{Histogram}\label{histogram}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{(ggplot2)}
+\KeywordTok{par}\NormalTok{(}\DataTypeTok{mfrow =} \KeywordTok{c}\NormalTok{(}\DecValTok{2}\NormalTok{, }\DecValTok{3}\NormalTok{))}
+\KeywordTok{hist}\NormalTok{(f}\OperatorTok{$}\NormalTok{Y, }\DataTypeTok{col =} \StringTok{'dark blue'}\NormalTok{, }\DataTypeTok{main =} \StringTok{'Y'}\NormalTok{, }\DataTypeTok{xlab =} \StringTok{'Value'}\NormalTok{)}
+\KeywordTok{hist}\NormalTok{(f}\OperatorTok{$}\NormalTok{X1, }\DataTypeTok{col =} \StringTok{'dark green'}\NormalTok{, }\DataTypeTok{main =} \StringTok{'X1'}\NormalTok{, }\DataTypeTok{xlab =} \StringTok{'Value'}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{L1_files/figure-latex/unnamed-chunk-1-1.pdf} \#\#
+Висновок:Розподіл змінних нормальний, не має довгих хвостів \#\#
+Box-plot
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{par}\NormalTok{(}\DataTypeTok{mfrow =} \KeywordTok{c}\NormalTok{(}\DecValTok{1}\NormalTok{, }\DecValTok{5}\NormalTok{))}
+\KeywordTok{boxplot}\NormalTok{(f}\OperatorTok{$}\NormalTok{Y)}
+\KeywordTok{boxplot}\NormalTok{(f}\OperatorTok{$}\NormalTok{X1)}
+\KeywordTok{boxplot}\NormalTok{(f}\OperatorTok{$}\NormalTok{X2)}
+\KeywordTok{boxplot}\NormalTok{(f}\OperatorTok{$}\NormalTok{X3)}
+\KeywordTok{boxplot}\NormalTok{(f}\OperatorTok{$}\NormalTok{X4)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{L1_files/figure-latex/unnamed-chunk-2-1.pdf}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{qplot}\NormalTok{(}\DataTypeTok{data =}\NormalTok{ f, }
+      \DataTypeTok{x =}\NormalTok{ X3, }
+      \DataTypeTok{y =}\NormalTok{ Y, }
+      \DataTypeTok{geom =} \StringTok{"boxplot"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Warning: Continuous x aesthetic -- did you forget aes(group=...)?
+\end{verbatim}
+
+\includegraphics{L1_files/figure-latex/unnamed-chunk-2-2.pdf} \#\#
+Висновок:Змінні У та Х4 мають невеликі викиди, змінна Х1 значні \#\#
+Violin
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{qplot}\NormalTok{(}\DataTypeTok{data =}\NormalTok{ f, }
+      \DataTypeTok{x =}\NormalTok{ X1, }
+      \DataTypeTok{y =}\NormalTok{ Y, }
+      \DataTypeTok{geom =} \StringTok{"violin"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\includegraphics{L1_files/figure-latex/unnamed-chunk-3-1.pdf} \#\#
+Висновок:Розподіл нормальний, не має пропущенних данних \# Statistics
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{library}\NormalTok{ (psych)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Attaching package: 'psych'
+\end{verbatim}
+
+\begin{verbatim}
+## The following objects are masked from 'package:ggplot2':
+## 
+##     %+%, alpha
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{describe}\NormalTok{(f)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##    vars  n  mean    sd median trimmed   mad   min   max range  skew kurtosis
+## t     1 98 49.50 28.43  49.50   49.50 36.32  1.00 98.00 97.00  0.00    -1.24
+## Y     2 98  1.01  0.22   1.00    1.00  0.25  0.58  1.66  1.08  0.37     0.04
+## X1    3 98  1.02  0.18   1.01    1.01  0.17  0.68  1.61  0.93  0.83     1.40
+## X2    4 98  4.92  1.27   4.32    4.80  0.63  3.34  7.60  4.26  0.81    -0.91
+## X3    5 98 57.00  8.08  57.10   56.97  9.34 38.20 77.00 38.80  0.19    -0.35
+## X4    6 98  0.46  0.08   0.46    0.46  0.09  0.22  0.61  0.38 -0.69     0.40
+##      se
+## t  2.87
+## Y  0.02
+## X1 0.02
+## X2 0.13
+## X3 0.82
+## X4 0.01
+\end{verbatim}
+
+\subsection{Висновок:Пропущених данних немає,всі змінні
+кількісні,розраховані медіана, середне відхилення, середнє,максимум та
+мінімум по кожній із
+змінних}\label{ux432ux438ux441ux43dux43eux432ux43eux43aux43fux440ux43eux43fux443ux449ux435ux43dux438ux445-ux434ux430ux43dux43dux438ux445-ux43dux435ux43cux430ux454ux432ux441ux456-ux437ux43cux456ux43dux43dux456-ux43aux456ux43bux44cux43aux456ux441ux43dux456ux440ux43eux437ux440ux430ux445ux43eux432ux430ux43dux456-ux43cux435ux434ux456ux430ux43dux430-ux441ux435ux440ux435ux434ux43dux435-ux432ux456ux434ux445ux438ux43bux435ux43dux43dux44f-ux441ux435ux440ux435ux434ux43dux454ux43cux430ux43aux441ux438ux43cux443ux43c-ux442ux430-ux43cux456ux43dux456ux43cux443ux43c-ux43fux43e-ux43aux43eux436ux43dux456ux439-ux456ux437-ux437ux43cux456ux43dux43dux438ux445}
+
+\section{Splitting the dataset into the TRAIN set and TEST
+set}\label{splitting-the-dataset-into-the-train-set-and-test-set}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\KeywordTok{set.seed}\NormalTok{(}\DecValTok{123}\NormalTok{)}
+\KeywordTok{library}\NormalTok{(caTools)}
+\NormalTok{split =}\StringTok{ }\KeywordTok{sample.split}\NormalTok{(f}\OperatorTok{$}\NormalTok{Y, }\DataTypeTok{SplitRatio =} \FloatTok{0.7}\NormalTok{)}
+\NormalTok{f_train =}\StringTok{ }\KeywordTok{subset}\NormalTok{(f, split }\OperatorTok{==}\StringTok{ }\OtherTok{TRUE}\NormalTok{)}
+\NormalTok{f_test =}\StringTok{ }\KeywordTok{subset}\NormalTok{(f, split }\OperatorTok{==}\StringTok{ }\OtherTok{FALSE}\NormalTok{)}
+\CommentTok{#Write prepared data to the file}
+\KeywordTok{write.csv2}\NormalTok{(f_train, }\DataTypeTok{file =} \StringTok{"indeks_train.csv"}\NormalTok{)}
+\KeywordTok{write.csv2}\NormalTok{(f_test, }\DataTypeTok{file =} \StringTok{"indeks_test.csv"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\end{document}

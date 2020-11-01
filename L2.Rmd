@@ -1,0 +1,77 @@
+---
+title: "R Notebook"
+output:
+  word_document: default
+  pdf_document: default
+  html_notebook: default
+---
+
+# Download data
+```{r warning: FALSE}
+path='C:/indeks.csv'
+f <- read.csv2(file = path, header = TRUE, encoding = 'UNICOD')
+#Connect library
+library (dplyr)
+#Have a look at the data
+glimpse(f)  
+head(f)
+```
+## Висновок: кількість спостережень:98 кількість змінних:6
+## Histogram
+```{r}
+library(ggplot2)
+par(mfrow = c(2, 3))
+hist(f$Y, col = 'dark blue', main = 'Y', xlab = 'Value')
+hist(f$X1, col = 'dark green', main = 'X1', xlab = 'Value')
+```
+## Висновок:Розподіл змінних нормальний, не має довгих хвостів
+## Box-plot
+```{r}
+par(mfrow = c(1, 5))
+boxplot(f$Y)
+boxplot(f$X1)
+boxplot(f$X2)
+boxplot(f$X3)
+boxplot(f$X4)
+qplot(data = f, 
+      x = X3, 
+      y = Y, 
+      geom = "boxplot")
+```
+## Висновок:Змінні У та Х4 мають невеликі викиди, змінна Х1 значні 
+## Violin
+```{r}
+qplot(data = f, 
+      x = X1, 
+      y = Y, 
+      geom = "violin")
+```
+## Висновок:Розподіл нормальний, не має пропущенних данних
+# Statistics
+
+```{r}
+library (psych)
+describe(f)
+```
+## Висновок:Пропущених данних немає,всі змінні кількісні,розраховані медіана, середне відхилення, середнє,максимум та мінімум по кожній із змінних
+# Correlations
+
+```{r}
+pairs.panels(f, lm=TRUE, # linear fit
+             method = "pearson", # correlation method
+             hist.col = "#00AFBB"
+             )
+# Splitting the dataset into the TRAIN set and TEST set
+
+```
+## Висновок:Більше всього на змінну У впливає змінна Х1
+```{r}
+set.seed(123)
+library(caTools)
+split = sample.split(f$Y, SplitRatio = 0.7)
+f_train = subset(f, split == TRUE)
+f_test = subset(f, split == FALSE)
+#Write prepared data to the file
+write.csv2(f_train, file = "indeks_train.csv")
+write.csv2(f_test, file = "indeks_test.csv")
+```

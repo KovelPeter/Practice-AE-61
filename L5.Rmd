@@ -1,0 +1,152 @@
+---
+title: "L5"
+author: "Kovel"
+date: '30 РѕРєС‚СЏР±СЂСЏ 2020 Рі '
+output:
+  word_document: default
+  html_document: default
+---
+
+# Download the data
+```{r}
+path='C:/education.csv'
+```
+
+```{r}
+set.seed(123)
+f <- read.csv(file = path, header = TRUE, encoding = 'UNICOD') 
+head (f)
+```
+##Висновок: для побудови моделі використані дані про освіту.
+# Statistics
+
+## Descriptive statistics
+```{r}
+library (psych)
+describe(f)
+```
+##Висновок: кількість спостережень – 395, кількість змінних – 9, з них якісних – 6, кількісних – 3. Пропущених значень і викидів немає.
+## Factors as numeric
+```{r}
+f$school <- as.numeric(as.factor(f$school))-1
+f$sex <- as.numeric(as.factor(f$sex))-1
+f$reason <- as.numeric(as.factor(f$reason))-1
+f$guardian <- as.numeric(as.factor(f$guardian))-1
+f$activities <- as.numeric(as.factor(f$activities))-1
+f$internet <- as.numeric(as.factor(f$internet))-1
+head (f)
+```
+##Висновок:моделі класифікації вимагають попереднього шкалювання кількісних змінних.
+# Splitting the scaled dataset into the TRAIN set and TEST set
+```{r}
+set.seed(123)
+library(caTools)
+split = sample.split(f$school, SplitRatio = 2/3)
+f_train = subset(f, split == TRUE)
+f_test = subset(f, split == FALSE)
+```
+##Висновок: підготований датасет розділено на навчальну та тестову вибірки.
+# Features Scaling
+```{r}
+mage <- mean(f_train$age)
+sage <- sd(f_train$age)
+mtraveltime <- mean(f_train$traveltime)
+straveltime <- sd(f_train$traveltime)
+mstudytime <- mean(f_train$studytime)
+sstudytime <- sd(f_train$studytime)
+
+f_train$age <- (f_train$age-mage)/sage
+f_test$age <- (f_test$age-mage)/sage
+
+f_train$traveltime <- (f_train$traveltime-mtraveltime)/straveltime
+f_test$traveltime <- (f_test$traveltime-mtraveltime)/straveltime
+
+f_train$studytime <- (f_train$studytime-mstudytime)/sstudytime
+f_test$studytime <- (f_test$studytime-mstudytime)/sstudytime
+
+head (f_train)
+head(f_test)
+```
+##Висновок:моделі класифікації вимагають попереднього шкалювання кількісних змінних.
+# Fitting (Benchmark model)
+```{r}
+class_lr <- glm(school ~ ., f_train, family = binomial)
+summary(class_lr)
+```
+##Висновок: значущими змінними є age, guardian та traveltime.
+## Optimized model
+```{r}
+class_opt <- glm(school ~ age + guardian + traveltime, f_train, family = binomial)
+summary(class_opt)
+```
+##Висновок: всі змінні оптимізованої моделі є значущими, AIC став нижчим
+# Predicting
+```{r}
+p <- predict(class_opt, f_test[,  c('age','guardian','traveltime')], type = 'response')
+y <- ifelse(p > 0.5, 1, 0)
+```
+## Висновок: розраховані ймовірності віднесення об’єктів до кожного з двох класів (вектор р), визначені класи об’єктів (вектор у).
+## Confusion Matrix
+```{r}
+cm = table(f_test[, 'school'], y > 0.5)
+print(cm)
+```
+##Висновок: точність моделі - (114 + 6) / 131 = 91,6 %, частка невірно класифікованих випадків – (9 + 2) / 131 = 8,3 %. Чутливість моделі – 6 / (9 + 6) = 40 %, специфічність – 114 / (114 + 2) = 98,2 %, тобто модель більш чутлива до виявлення негативних випадків.
+## ROC
+```{r}
+library(ROCR)
+pref <- prediction(p, f_test$school)
+perf <- performance(pref, "tpr", "fpr")
+plot(perf)
+```
+##Висновок: співвідношення істинно-позитивних і хибно-позитивних випадків свідчить про досить високу якість моделі.
+## Optimized model2
+```{r}
+class_opt2 <- glm(school ~ age + traveltime, f_train, family = binomial)
+summary(class_opt2)
+```
+##Висновок: всі змінні оптимізованої моделі є дуже значущими, AIC став трохи вищим
+# Predicting
+```{r}
+p <- predict(class_opt2, f_test[,  c('age','traveltime')], type = 'response')
+y <- ifelse(p > 0.5, 1, 0)
+```
+## Висновок: розраховані ймовірності віднесення об’єктів до кожного з двох класів (вектор р), визначені класи об’єктів (вектор у).
+## Confusion Matrix
+```{r}
+cm = table(f_test[, 'school'], y > 0.5)
+print(cm)
+```
+##Висновок: точність моделі - (113 + 6) / 131 = 90,8 %, частка невірно класифікованих випадків – (9 + 3) / 131 = 9,1 %. Чутливість моделі – 6 / (9 + 6) = 40 %, специфічність – 113 / (113 + 3) = 97,4 %, тобто модель більш чутлива до виявлення негативних випадків.
+## ROC
+```{r}
+library(ROCR)
+pref <- prediction(p, f_test$school)
+perf <- performance(pref, "tpr", "fpr")
+plot(perf)
+```
+##Висновок: співвідношення істинно-позитивних і хибно-позитивних випадків свідчить про досить високу якість моделі.
+# Visualising the Test set results
+```{r}
+library(ggplot2)
+set = f_test[,c('age','traveltime','school')]
+X1 = seq(min(set['age']) - 1, max(set['age']) + 1, by = 0.01)
+X2 = seq(min(set['traveltime']) - 1, max(set['traveltime']) + 1, by = 0.01)
+grid_set = expand.grid(X1, X2)
+colnames(grid_set) = c('age', 'traveltime')
+prob_set = predict(class_opt2, grid_set, type = 'response')
+y_grid = ifelse(prob_set > 0.5, 1, 0)
+plot(set[, -3],
+     main = 'Logistic Regression',
+     xlab = 'age', ylab = 'traveltime',
+     xlim = range(X1), ylim = range(X2))
+contour(X1, X2, matrix(as.numeric(y_grid), length(X1), length(X2)), add = TRUE)
+points(grid_set, pch = '.', col = ifelse(y_grid == 1, 'tomato', 'springgreen3'))
+points(set, pch = 21, bg = ifelse(set[, 3] == 1, 'red3', 'green4'))
+```
+## Построєно графік. Модель описує лінійний варіант розділяючої кривої.
+# Write prepared data to the file
+```{r}
+write.csv2(f_train, file = "education_train.csv")
+write.csv2(f_test, file = "education_test.csv")
+```
